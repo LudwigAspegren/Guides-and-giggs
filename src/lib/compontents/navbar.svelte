@@ -3,8 +3,11 @@
 </script>
 
 <div class="navbar bg-base-100">
-	<div class="flex-1">
+	<div>
 		<a class="normal-case text-xl" href="/">PUG-2022</a>
+	</div>
+	<div>
+		<a class="btn btn-sm btn-primary" href="/tickets/create"> Create ticket </a>
 	</div>
 	<div class="flex-none">
 		<ul class="menu menu-horizontal p-0">

@@ -25,7 +25,6 @@
 	const loadProfile = async () => {
 		try {
 			if (!$user) throw 'no user found';
-
 			let { data, error } = await supabase
 				.from<data>('profiles')
 				.select(`username,id`)
