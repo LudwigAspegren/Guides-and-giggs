@@ -1,32 +1,33 @@
 <script context="module" lang="ts">
+	export const load: Load = async () => {
+		const { data, error } = await supabase.from('tickets').select(queries.fullTicketQuery);
+		const tickets = TicketValidator.array().parse(data);
+		return {
+			props: {
+				tickets
+			}
+		};
+	};
 </script>
 
 <script lang="ts">
-	import { browser } from '$app/env';
-	import { getTickets } from '$lib/data/tickets';
-	import { AuthModule } from '$lib/stores/msalStore';
-	import type { Ticket } from '$lib/types';
-
-	const token = AuthModule.token;
-	let res: Promise<Array<Ticket>>;
-
-	if (browser) {
-		res = getTickets($token);
-	}
+	import { queries } from '$lib/data/queries';
+	import { TicketValidator, type Ticket } from '$lib/data/validation';
+	import { supabase } from '$lib/supabaseClient';
+	import type { Load } from '@sveltejs/kit';
+	export let tickets: Ticket[];
 </script>
 
-{#await res}
-	<p>loading</p>
-{:then tickets}
-	{#each tickets as ticket}
-		<h2>
-			{ticket.title}
-		</h2>
-		<b>
-			{ticket.content}
-		</b>
-		<p>
-			{ticket.date}
-		</p>
-	{/each}
-{/await}
+{#each tickets as ticket}
+	<h2>
+		{ticket.title}
+	</h2>
+	<b>
+		{#if ticket.ticket_messages.length > 0}
+			{ticket.ticket_messages[0].content}
+		{/if}
+	</b>
+	<p>
+		{ticket.date_created}
+	</p>
+{/each}

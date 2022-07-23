@@ -3,46 +3,53 @@
 
 	export const load: Load = async (event) => {
 		const ticketId = event.params.ticketId;
-		const thread = await getThread(ticketId);
-		return {
-			props: {
-				thread
-			}
-		};
+		const { data, error } = await supabase
+			.from('tickets')
+			.select(queries.fullTicketQuery)
+			.eq('id', ticketId)
+			.single();
+		console.log(data);
+		let ticket = TicketValidator.parse(data);
+		return { props: { ticket, ticketId } };
 	};
 </script>
 
 <script lang="ts">
-	import { getThread } from '$lib/data/threads';
-	import type { Thread } from '$lib/types';
-
-	export let thread: Thread | undefined;
+	export let ticket: Ticket;
+	export let ticketMessage: TicketMessage;
+	console.log(ticket);
+	import { queries } from '$lib/data/queries';
+	import { TicketValidator, type Ticket, type TicketMessage } from '$lib/data/validation';
+	import { supabase } from '$lib/supabaseClient';
+	$: if (ticketMessage) {
+		console.log('jag');
+		ticket.ticket_messages = [...ticket.ticket_messages, ticketMessage];
+	}
 </script>
 
-{#if thread}
-	<div class="card w-96 bg-base-100 shadow-xl">
-		<div class="card-body">
-			<h2 class="card-title">{thread.ticket.title}</h2>
-			{#if thread.ticketMessages.length > 0}
-				<p>{thread.ticketMessages[0].content}</p>
-			{/if}
-			<div class="card-actions justify-end">
-				<button class="btn btn-primary">Reply</button>
+<main class="flex gap-4 flex-col">
+	{#if ticket}
+		<div class="card bg-base-100 w-full shadow-xl">
+			<div class="card-body">
+				<h2 class="card-title">{ticket.title}</h2>
+				{#if ticket.ticket_messages.length > 0}
+					<p>{ticket.ticket_messages[0].content}</p>
+				{/if}
 			</div>
 		</div>
-	</div>
-	{#each thread.ticketMessages as message, i}
-		{#if i !== 0}
-			<div class="card w-96 bg-base-100 shadow-xl">
-				<div class="card-body">
-					<h2 class="card-title">{message.user.name}</h2>
-					<p>{message.content}</p>
-					<p>{message.dateUpdated ?? message.dateCreated}</p>
-					<div class="card-actions justify-end">
-						<button class="btn btn-primary">Reply</button>
+		{#each ticket.ticket_messages as message, i}
+			{#if i !== 0}
+				<div class="card w-full bg-base-100 shadow-sm">
+					<div class="card-body">
+						<h2 class="card-title">{message.profiles.username}</h2>
+						<p>{message.content}</p>
+						<p>{message.date_updated ?? message.date_created}</p>
+						<div class="card-actions justify-end">
+							<button class="btn btn-primary">Reply</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		{/if}
-	{/each}
-{/if}
+			{/if}
+		{/each}
+	{/if}
+</main>

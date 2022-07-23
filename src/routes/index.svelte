@@ -1,17 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 
-	import { getTickets } from '$lib/data/tickets';
-
-	const ticketPromise = getTickets();
 	const gotoTicket = (id: number) => {
 		goto(`/tickets/${id}`);
 	};
 </script>
 
+<!-- 
 <div class="overflow-x-auto">
 	<table class="table w-full">
-		<!-- head -->
+
 		<thead>
 			<tr>
 				<th>Title</th>
@@ -26,7 +24,6 @@
 			{:then tickets}
 				{#if tickets}
 					{#each tickets as ticket}
-						<!-- row 1 -->
 						<tr
 							class="hover:bg-gray-50 hover:cursor-pointer"
 							on:click={() => gotoTicket(ticket.id)}
@@ -45,4 +42,4 @@
 			{/await}
 		</tbody>
 	</table>
-</div>
+</div> -->

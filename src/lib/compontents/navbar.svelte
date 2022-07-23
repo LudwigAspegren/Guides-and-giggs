@@ -1,6 +1,5 @@
-<script lang="ts">
-	import { AuthModule } from '$lib/stores/msalStore';
-	const user = AuthModule.user;
+<script>
+	import { user, username } from '$lib/stores/userStore';
 </script>
 
 <div class="navbar bg-base-100">
@@ -11,7 +10,7 @@
 		<ul class="menu menu-horizontal p-0">
 			<li tabindex="0">
 				<p>
-					{$user?.name}
+					{$username}
 					<svg
 						class="fill-current"
 						xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +21,7 @@
 					>
 				</p>
 				<ul class="p-2 bg-base-100">
-					<li><a href="/users/{$user?.id}">Profile</a></li>
+					<li><a href="/profiles/{$user?.id}">Profile</a></li>
 					<li><a href="/logout">Log out</a></li>
 				</ul>
 			</li>
