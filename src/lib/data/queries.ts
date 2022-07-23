@@ -5,7 +5,10 @@ export const queries = (() => {
         username
     `
     const fullTicketQuery = `
-        title,date_updated,date_created,
+        id,      
+        title,
+        date_updated,
+        date_created,
         profiles ( ${fullUserQuery} ),
         statuses ( name ),
         courses ( name ),

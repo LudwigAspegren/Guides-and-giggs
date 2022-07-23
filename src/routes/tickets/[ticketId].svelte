@@ -10,14 +10,15 @@
 			.single();
 		console.log(data);
 		let ticket = TicketValidator.parse(data);
-		return { props: { ticket, ticketId } };
+		return { props: { ticket } };
 	};
 </script>
 
 <script lang="ts">
 	export let ticket: Ticket;
-	export let ticketMessage: TicketMessage;
+	let ticketMessage: TicketMessage;
 	console.log(ticket);
+	import MessageForm from '$lib/compontents/messageForm.svelte';
 	import { queries } from '$lib/data/queries';
 	import { TicketValidator, type Ticket, type TicketMessage } from '$lib/data/validation';
 	import { supabase } from '$lib/supabaseClient';
@@ -53,3 +54,4 @@
 		{/each}
 	{/if}
 </main>
+<MessageForm bind:ticketMessage ticketId={ticket.id} />

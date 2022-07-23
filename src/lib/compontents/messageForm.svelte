@@ -10,6 +10,7 @@
 	import { z } from 'zod';
 
 	export let ticketId: number;
+	let loading = false;
 	let content: string;
 	export let ticketMessage: TicketMessage;
 	$: ticketMessage, console.log('hej');
@@ -18,12 +19,12 @@
 		content: z.string().min(1, "Comment can't be empty")
 	});
 
-	const { form } = createForm<z.infer<typeof createMessgeValidator>>({
+	const { form, data, reset } = createForm<z.infer<typeof createMessgeValidator>>({
 		validate: validateSchema(createMessgeValidator),
 		extend: reporter(),
-
 		onSubmit: async (values) => {
 			try {
+				loading = true;
 				const { data, error } = await supabase
 					.from('ticket_messages')
 					.insert([
@@ -41,6 +42,9 @@
 				ticketMessage = TicketMessageValidator.parse(data);
 			} catch (e: any) {
 				console.log(e.message || e);
+			} finally {
+				loading = false;
+				reset();
 			}
 		}
 	});

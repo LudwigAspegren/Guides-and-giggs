@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const TicketMessageValidator = z.object({
-    id: z.number(),
+    id: z.number().optional(),
     content: z.string(),
     profiles: z.object({ username: z.string() }),
     date_updated: z.string().nullable(),
@@ -15,6 +15,7 @@ export const ProfileValidator = z.object({
 })
 
 export const TicketValidator = z.object({
+    id: z.number(),
     title: z.string(),
     date_created: z.string(),
     date_updated: z.string().nullable(),
