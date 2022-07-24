@@ -2,6 +2,8 @@
 	export const load: Load = async () => {
 		const { data, error } = await supabase.from('tickets').select(queries.fullTicketQuery);
 		console.log(data);
+		console.log('error?.message');
+		console.log(error?.message);
 		const tickets = TicketValidator.array().parse(data);
 		return {
 			props: {

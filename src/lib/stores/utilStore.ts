@@ -35,6 +35,5 @@ export const setUtils = async () => {
     const responses = await Promise.all([coursePromise, statusPromise, computerPromise]);
     courses.set(z.array(CourseValidator).parse(responses[0].data))
     statuses.set(z.array(StatusValidator).parse(responses[1].data))
-    console.log(responses[2].data)
     computers.set(z.array(ComputerValidator).parse(responses[2].data))
 }

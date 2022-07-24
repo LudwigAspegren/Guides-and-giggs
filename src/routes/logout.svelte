@@ -1,8 +1,10 @@
 <script context="module">
-	import { browser } from '$app/env';
-	import { AuthModule } from '$lib/stores/msalStore';
-	AuthModule.loadAuthModule();
-	if (browser) {
-		AuthModule.logout();
-	}
+	import { user } from '$lib/stores/userStore';
+
+	import { supabase } from '$lib/supabaseClient';
+	const signOut = async () => {
+		const { error } = await supabase.auth.signOut();
+		user.set(null);
+	};
+	signOut();
 </script>
