@@ -1,15 +1,19 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import basicSsl from '@vitejs/plugin-basic-ssl'
-
+import fs from 'fs'
 /** @type {import('vite').UserConfig} */
 const config = {
-	plugins: [sveltekit(),
-	basicSsl()],
+	plugins: [sveltekit()],
 	ssr: {
 		noExternal: ['@popperjs/core']
 	  },
 	server:{
-		port:3000
+		// https: {
+		// 	key: fs.readFileSync('./.cert/key.pem'),
+		// 	cert: fs.readFileSync('./.cert/cert.pem'),
+			
+		// },
+		host:'127.0.0.1',
+		port:3000,
 	}
 };
 

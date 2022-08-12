@@ -1,9 +1,7 @@
 <script context="module" lang="ts">
 	export const load: Load = async () => {
-		const { data, error } = await supabase.from('tickets').select(queries.fullTicketQuery);
-		console.log(data);
-		console.log('error?.message');
-		console.log(error?.message);
+		if (!supabaseClient) throw 'supabase clinet not instantiated';
+		const { data, error } = await supabaseClient.from('tickets').select(queries.fullTicketQuery);
 		const tickets = TicketValidator.array().parse(data);
 		return {
 			props: {
@@ -18,12 +16,22 @@
 
 	import { queries } from '$lib/data/queries';
 	import { TicketValidator, type Ticket } from '$lib/data/validation';
-	import { supabase } from '$lib/supabaseClient';
+	import { supabaseClient } from '$lib/supabaseClient';
 	import type { Load } from '@sveltejs/kit';
 	export let tickets: Ticket[];
 	const gotoTicket = (id: number) => {
 		goto(`/tickets/${id}`);
 	};
+
+	const chunkArray = (ticketPerPage: number, list: Array<Ticket>) => {
+		const chunks: Array<Array<Ticket>> = [];
+		for (let i = 0; i < list.length; i += ticketPerPage) {
+			const chunk = list.slice(i, i + ticketPerPage);
+			chunks.push(chunk);
+		}
+		return chunks;
+	};
+	const TicketsChunks = chunkArray(50, tickets);
 </script>
 
 <table class="table w-full">
@@ -36,19 +44,17 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#if tickets}
-			{#each tickets as ticket}
-				<tr class="hover:bg-gray-50 hover:cursor-pointer" on:click={() => gotoTicket(ticket.id)}>
-					<th>{ticket.title}</th>
-					<td
-						><a href="/users/{ticket.profiles.id}">
-							{ticket.profiles.username}
-						</a>
-					</td>
-					<td>{ticket.statuses.name}</td>
-					<td>{ticket.courses.name}</td>
-				</tr>
-			{/each}
-		{/if}
+		{#each tickets as ticket}
+			<tr class="hover:bg-gray-50 hover:cursor-pointer" on:click={() => gotoTicket(ticket.id)}>
+				<th>{ticket.title}</th>
+				<td
+					><a href="/users/{ticket.profiles.id}">
+						{ticket.profiles.username}
+					</a>
+				</td>
+				<td>{ticket.statuses.name}</td>
+				<td>{ticket.courses.name}</td>
+			</tr>
+		{/each}
 	</tbody>
 </table>

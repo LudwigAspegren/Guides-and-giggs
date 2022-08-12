@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores/userStore';
-	import { supabase } from '$lib/supabaseClient';
+	import { supabaseClient } from '$lib/supabaseClient';
 
 	import { queries } from '$lib/data/queries';
 	import { TicketMessageValidator, type TicketMessage } from '$lib/data/validation';
@@ -13,7 +13,6 @@
 	let loading = false;
 	let content: string;
 	export let ticketMessage: TicketMessage;
-	$: ticketMessage, console.log('hej');
 
 	const createMessgeValidator = z.object({
 		content: z.string().min(1, "Comment can't be empty")
@@ -25,7 +24,8 @@
 		onSubmit: async (values) => {
 			try {
 				loading = true;
-				const { data, error } = await supabase
+				if (!supabaseClient) throw 'supabase clinet not instantiated';
+				const { data, error } = await supabaseClient
 					.from('ticket_messages')
 					.insert([
 						{
@@ -38,10 +38,10 @@
 					.select(queries.fullTicketMessageQuery)
 					.single();
 				if (data) console.log(data);
-				if (error) throw error;
+				if (error) throw error.message;
 				ticketMessage = TicketMessageValidator.parse(data);
 			} catch (e: any) {
-				console.log(e.message || e);
+				console.log(e);
 			} finally {
 				loading = false;
 				reset();

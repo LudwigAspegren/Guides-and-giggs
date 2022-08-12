@@ -7,15 +7,16 @@
 		type Ticket
 	} from '$lib/data/validation';
 
-	import { supabase } from '$lib/supabaseClient';
+	import { supabaseClient } from '$lib/supabaseClient';
 	export const load: Load = async (event) => {
+		if (!supabaseClient) throw 'supabase clinet not instantiated';
 		const userId = event.params.userId;
-		const userPromise = supabase
+		const userPromise = supabaseClient
 			.from('profiles')
 			.select(queries.fullUserQuery)
 			.eq('id', userId)
 			.single();
-		const ticketsPromise = supabase
+		const ticketsPromise = supabaseClient
 			.from('tickets')
 			.select(queries.fullTicketQuery)
 			.eq('user_id', userId);

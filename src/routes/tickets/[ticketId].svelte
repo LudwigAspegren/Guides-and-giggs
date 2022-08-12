@@ -3,7 +3,8 @@
 
 	export const load: Load = async (event) => {
 		const ticketId = event.params.ticketId;
-		const { data, error } = await supabase
+		if (!supabaseClient) throw 'supabase clinet not instantiated';
+		const { data, error } = await supabaseClient
 			.from('tickets')
 			.select(queries.fullTicketQuery)
 			.eq('id', ticketId)
@@ -21,7 +22,7 @@
 	import MessageForm from '$lib/compontents/messageForm.svelte';
 	import { queries } from '$lib/data/queries';
 	import { TicketValidator, type Ticket, type TicketMessage } from '$lib/data/validation';
-	import { supabase } from '$lib/supabaseClient';
+	import { supabaseClient } from '$lib/supabaseClient';
 	$: if (ticketMessage) {
 		console.log('jag');
 		ticket.ticket_messages = [...ticket.ticket_messages, ticketMessage];
