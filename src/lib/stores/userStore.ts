@@ -13,8 +13,8 @@ export const setProfile = async (userId: string) => {
 		if (data) username.set(data.username);
 
 		if (error) throw error.code;
-	} catch (e: any) {
-		if (e === 'PGRST116') username.set(null)
+	} catch (e) {
+		if (e === 'PGRST116') username.set(null);
 		console.log(e);
 	}
 };

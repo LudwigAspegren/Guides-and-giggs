@@ -1,16 +1,23 @@
 <script lang="ts">
 	import { browser } from '$app/env';
-	import { goto } from '$app/navigation';
+	import { goto, afterNavigate } from '$app/navigation';
 	import { session } from '$app/stores';
+	import { username } from '$lib/stores/userStore';
 
 	import { supabaseClient } from '$lib/supabaseClient';
 
 	let loading = false;
 	let email: string;
-
+	let previousPage: string;
+	afterNavigate((navigation) => {
+		if (navigation.from) previousPage = navigation.from.pathname;
+		else previousPage = '/';
+	});
 	$: if (browser) {
-		if ($session) {
-			goto('/');
+		console.log($session.user);
+		console.log($username);
+		if ($session.user) {
+			goto(previousPage);
 		}
 	}
 	const handleLogin = async () => {
@@ -21,7 +28,7 @@
 				{
 					email
 				},
-				{ redirectTo: 'https://127.0.0.1:3000/welcome' }
+				{ redirectTo: 'http://127.0.0.1:3000/welcome', queryParams: { previous_page: 'tickets' } }
 			);
 			if (error) throw error.message;
 			alert('Check your email for the login link!');

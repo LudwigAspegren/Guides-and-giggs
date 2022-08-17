@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { session } from '$app/stores';
 
 	import { user } from '$lib/stores/userStore';
 
@@ -30,7 +31,6 @@
 		courses: z.object({ name: z.string() }),
 		ticket_messages: z.array(TicketMessageValidator)
 	});
-	type Ticket = z.infer<typeof TicketValidator>;
 
 	const createTicketValidator = z.object({
 		title: z.string().min(1, "Title can't be empty"),
@@ -51,14 +51,17 @@
 					.insert({
 						title: values.title,
 						date_created: new Date().toISOString(),
-						user_id: $user?.id,
+						user_id: $session.user.id,
 						course_id: values.courseId,
 						at_computer_lab: atComputerLab,
 						status_id: 1
 					})
 					.select('id')
 					.single();
+				console.log(ticketData);
+				if (ticketError) throw ticketError.message;
 				ticketId = ticketData.id;
+
 				if (ticketError) throw ticketError;
 				if (atComputerLab) {
 					if (!supabaseClient) throw 'supabase clinet not instantiated';
@@ -81,7 +84,7 @@
 						ticket_id: ticketData.id,
 						content: values.content,
 						date_created: new Date().toISOString(),
-						user_id: $user?.id
+						user_id: $session.user.id
 					});
 				if (messageError) throw messageError;
 				goto(`/tickets/${ticketData.id}`);

@@ -10,6 +10,7 @@
 	import { supabaseClient } from '$lib/supabaseClient';
 	export const load: Load = async (event) => {
 		if (!supabaseClient) throw 'supabase clinet not instantiated';
+
 		const userId = event.params.userId;
 		const userPromise = supabaseClient
 			.from('profiles')
@@ -20,6 +21,7 @@
 			.from('tickets')
 			.select(queries.fullTicketQuery)
 			.eq('user_id', userId);
+
 		const responses = await Promise.all([userPromise, ticketsPromise]);
 		console.log(responses[0].data);
 		const user = ProfileValidator.parse(responses[0].data);

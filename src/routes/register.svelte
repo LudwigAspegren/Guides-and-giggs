@@ -4,13 +4,13 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { goto } from '$app/navigation';
+	import { session } from '$app/stores';
 
-	import { user, username } from '$lib/stores/userStore';
+	import { setProfile, user, username } from '$lib/stores/userStore';
 	import { supabaseClient } from '$lib/supabaseClient';
 	import { reporter } from '@felte/reporter-svelte';
 	import { validateSchema } from '@felte/validator-zod';
 	import { createForm } from 'felte';
-	import { get } from 'svelte/store';
 	import { z } from 'zod';
 	$: if (browser) {
 		if ($username) {
@@ -28,10 +28,9 @@
 			loading = true;
 			console.log(values);
 			try {
-				if (!supabaseClient) throw 'supabase clinet not instantiated';
 				const { data, error } = await supabaseClient.from('profiles').upsert({
 					username: values.username,
-					id: get(user)?.id
+					id: $session.user.id
 				});
 				if (error) throw error;
 				return { data };
@@ -40,6 +39,10 @@
 			} finally {
 				loading = false;
 			}
+		},
+		onSuccess: async (values) => {
+			setProfile($session.user.id);
+			goto('/tickets');
 		}
 	});
 </script>

@@ -1,24 +1,18 @@
-<script context="module" lang="ts">
-	export const load: Load = async () => {
-		if (!supabaseClient) throw 'supabase clinet not instantiated';
-		const { data, error } = await supabaseClient.from('tickets').select(queries.fullTicketQuery);
-		const tickets = TicketValidator.array().parse(data);
-		return {
-			props: {
-				tickets
-			}
-		};
-	};
-</script>
-
 <script lang="ts">
 	import { goto } from '$app/navigation';
-
 	import { queries } from '$lib/data/queries';
 	import { TicketValidator, type Ticket } from '$lib/data/validation';
 	import { supabaseClient } from '$lib/supabaseClient';
-	import type { Load } from '@sveltejs/kit';
+
 	export let tickets: Ticket[];
+	async function loadData() {
+		if (!supabaseClient) throw 'supabase clinet not instantiated';
+		const { data } = await supabaseClient.from('tickets').select(queries.fullTicketQuery);
+		tickets = TicketValidator.array().parse(data);
+	}
+
+	loadData();
+
 	const gotoTicket = (id: number) => {
 		goto(`/tickets/${id}`);
 	};
@@ -31,30 +25,40 @@
 		}
 		return chunks;
 	};
-	const TicketsChunks = chunkArray(50, tickets);
+	let TicketsChunks: Array<Array<Ticket>>;
+	$: {
+		if (tickets) {
+			console.log(tickets);
+
+			TicketsChunks = chunkArray(50, tickets);
+		}
+	}
 </script>
 
-<table class="table w-full">
-	<thead>
-		<tr>
-			<th>Title</th>
-			<th>Name</th>
-			<th>Status</th>
-			<th>Course</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each tickets as ticket}
-			<tr class="hover:bg-gray-50 hover:cursor-pointer" on:click={() => gotoTicket(ticket.id)}>
-				<th>{ticket.title}</th>
-				<td
-					><a href="/users/{ticket.profiles.id}">
-						{ticket.profiles.username}
-					</a>
-				</td>
-				<td>{ticket.statuses.name}</td>
-				<td>{ticket.courses.name}</td>
+<h1 class="h1">Tickets</h1>
+{#if tickets}
+	<table class="table w-full">
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Name</th>
+				<th>Status</th>
+				<th>Course</th>
 			</tr>
-		{/each}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{#each tickets as ticket}
+				<tr class="hover:bg-gray-50 hover:cursor-pointer" on:click={() => gotoTicket(ticket.id)}>
+					<th>{ticket.title}</th>
+					<td
+						><a href="/users/{ticket.profiles.id}">
+							{ticket.profiles.username}
+						</a>
+					</td>
+					<td>{ticket.statuses.name}</td>
+					<td>{ticket.courses.name}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+{/if}

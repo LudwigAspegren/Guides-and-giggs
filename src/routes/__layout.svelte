@@ -1,26 +1,21 @@
 <script lang="ts" context="module">
 	import '../app.css';
-
-	if (browser) {
-		if (!get(courses)) setUtils();
-	}
 </script>
 
 <script lang="ts">
-	import { browser } from '$app/env';
-	import { session } from '$app/stores';
+	import { page, session } from '$app/stores';
 	import { setProfile, username } from '$lib/stores/userStore';
 	import { courses, setUtils } from '$lib/stores/utilStore';
 	import { supabaseClient } from '$lib/supabaseClient';
 	import { SupaAuthHelper } from '@supabase/auth-helpers-svelte';
 	import { get } from 'svelte/store';
 	const loadData = async () => {
-		if (!get(username)) await setProfile($session.user.id);
+		if (get(username) === undefined) await setProfile($session.user.id);
+		if (!get(courses)) await setUtils();
 	};
 	$: if ($session.user && $session.user.id) {
 		loadData();
 	}
-	console.log($session);
 </script>
 
 {#if supabaseClient}
@@ -52,7 +47,7 @@
 							<a class="normal-case text-xl lg:hidden" href="/">PUG-2022</a>
 						</div>
 						<div class="flex gap-4">
-							{#if $session.user && $username}
+							{#if $username}
 								<div>
 									<a class="btn btn-sm btn-primary" href="/tickets/create"> Create ticket </a>
 								</div>
@@ -74,12 +69,12 @@
 											</p>
 											<ul class="p-2 bg-base-100">
 												<li><a href="/profiles/{$session.user?.id}">Profile</a></li>
-												<li><a href="/api/auth/logout///">Log out</a></li>
+												<li><a href="/api/auth/logout">Log out</a></li>
 											</ul>
 										</li>
 									</ul>
 								</div>
-							{:else}
+							{:else if !$session.user}
 								<a class="btn btn-sm btn-primary mr-4" href="/login"> Login </a>
 							{/if}
 						</div>

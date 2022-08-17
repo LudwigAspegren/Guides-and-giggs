@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { user } from '$lib/stores/userStore';
 	import { supabaseClient } from '$lib/supabaseClient';
 
+	import { session } from '$app/stores';
 	import { queries } from '$lib/data/queries';
 	import { TicketMessageValidator, type TicketMessage } from '$lib/data/validation';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
@@ -18,9 +18,10 @@
 		content: z.string().min(1, "Comment can't be empty")
 	});
 
-	const { form, data, reset } = createForm<z.infer<typeof createMessgeValidator>>({
+	const { form, reset, createSubmitHandler } = createForm<z.infer<typeof createMessgeValidator>>({
 		validate: validateSchema(createMessgeValidator),
 		extend: reporter(),
+
 		onSubmit: async (values) => {
 			try {
 				loading = true;
@@ -32,7 +33,7 @@
 							ticket_id: ticketId,
 							content: values.content,
 							date_created: new Date().toISOString(),
-							user_id: $user?.id
+							user_id: $session.user.id
 						}
 					])
 					.select(queries.fullTicketMessageQuery)
@@ -48,6 +49,9 @@
 			}
 		}
 	});
+	const disableEnter = (event: KeyboardEvent) => {
+		if (event.code === 'Enter' && loading) event.preventDefault();
+	};
 </script>
 
 <form use:form class="flex flex-col gap-2 pb-16">
@@ -57,10 +61,12 @@
 		class="textarea w-full"
 		name="content"
 		aria-describedby="content-validation"
+		on:submit|preventDefault
 		bind:value={content}
+		on:keypress={disableEnter}
 	/>
 	<div class="flex justify-between">
-		<button class="btn" type="submit" disabled={!content}>Comment</button>
+		<input class="btn" type="submit" disabled={loading} value="Comment" />
 		<ValidationMessage for="content" let:messages>
 			{messages?.[0] || ''}
 		</ValidationMessage>
