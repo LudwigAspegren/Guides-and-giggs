@@ -3,7 +3,11 @@
 </script>
 
 <script lang="ts">
+<<<<<<< HEAD
 	import { page, session } from '$app/stores';
+=======
+	import { session } from '$app/stores';
+>>>>>>> abd3f11 (Serverside login working with improvements)
 	import { setProfile, username } from '$lib/stores/userStore';
 	import { courses, setUtils } from '$lib/stores/utilStore';
 	import { supabaseClient } from '$lib/supabaseClient';
