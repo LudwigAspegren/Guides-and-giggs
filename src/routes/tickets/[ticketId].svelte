@@ -38,7 +38,7 @@
 	{#if ticket}
 		<div class="flex justify-between">
 			<h1 class="h1 ">{ticket.title}</h1>
-			{#if ticket.profiles.id === $session.user.id}
+			{#if $session.user && ticket.profiles.id === $session.user.id}
 				<a class="grid place-items-center" href="/tickets/{ticket.id}/edit ">
 					<span class="material-symbols-outlined border-gray-500 "> edit</span>
 				</a>
