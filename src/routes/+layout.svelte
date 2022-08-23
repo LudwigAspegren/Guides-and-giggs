@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { courses, setUtils } from '$lib/stores/utilStore';
+	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 	import type { LayoutData } from '.svelte-kit/types/src/routes/$types';
 	import { get } from 'svelte/store';
 	import '../app.css';
@@ -12,6 +13,9 @@
 	$: if (data.user && data.user.id) {
 		loadData();
 	}
+	const logout = async () => {
+		await supabaseClientV2.auth.signOut();
+	};
 </script>
 
 <!-- <SupaAuthHelper {supabaseClient} {session}> -->
@@ -62,7 +66,7 @@
 									</p>
 									<ul class="p-2 bg-base-100">
 										<li><a href="/profiles/{data.user?.id}">Profile</a></li>
-										<li><a href="/api/auth/logout">Log out</a></li>
+										<li><a on:click={logout} href="/tickets">Log out</a></li>
 									</ul>
 								</li>
 							</ul>

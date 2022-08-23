@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { computers, courses } from '$lib/stores/utilStore';
-	import { supabaseClient } from '$lib/supabaseClient';
+	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import { validateSchema } from '@felte/validator-zod';
 	import { createForm } from 'felte';
@@ -40,10 +40,11 @@
 		extend: reporter(),
 
 		onSubmit: async (values) => {
+			console.log(values);
 			loading = true;
 			try {
-				if (!supabaseClient) throw 'supabase clinet not instantiated';
-				const { data: ticketData, error: ticketError } = await supabaseClient
+				if (!supabaseClientV2) throw 'supabase clinet not instantiated';
+				const { data: ticketData, error: ticketError } = await supabaseClientV2
 					.from('tickets')
 					.insert({
 						title: values.title,
@@ -61,21 +62,21 @@
 
 				if (ticketError) throw ticketError;
 				if (atComputerLab) {
-					if (!supabaseClient) throw 'supabase clinet not instantiated';
-					const { error: labTicketError } = await supabaseClient.from('school_tickets').insert({
+					if (!supabaseClientV2) throw 'supabase clinet not instantiated';
+					const { error: labTicketError } = await supabaseClientV2.from('school_tickets').insert({
 						ticket_id: ticketData.id,
 						computer_id: computerId
 					});
 					if (labTicketError) throw labTicketError;
 				} else {
-					if (!supabaseClient) throw 'supabase clinet not instantiated';
-					const { error: homeTicketError } = await supabaseClient.from('home_tickets').insert({
+					if (!supabaseClientV2) throw 'supabase clinet not instantiated';
+					const { error: homeTicketError } = await supabaseClientV2.from('home_tickets').insert({
 						ticket_id: ticketData.id,
 						operating_system: operatingSystem
 					});
 					if (homeTicketError) throw homeTicketError;
 				}
-				const { data: messageData, error: messageError } = await supabaseClient
+				const { data: messageData, error: messageError } = await supabaseClientV2
 					.from('ticket_messages')
 					.insert({
 						ticket_id: ticketData.id,
@@ -88,11 +89,10 @@
 			} catch (e: any) {
 				alert(e.message);
 				if (!ticketId) return;
-				if (!supabaseClient) throw 'supabase clinet not instantiated';
-				const { data: deleteData, error: deleteError } = await supabaseClient
+				if (!supabaseClientV2) throw 'supabase clinet not instantiated';
+				const { data: deleteData, error: deleteError } = await supabaseClientV2
 					.from('tickets')
 					.delete()
-					.select('*')
 					.eq('id', ticketId);
 				if (deleteError) throw deleteError.message;
 				if (deleteData) console.log(deleteData);
