@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 	import { createForm } from 'felte';
+	import type { Errors, PageData } from './$types';
 
 	let modalTitle: string;
 	let modalContent: string;
@@ -13,6 +14,11 @@
 		previousPage: string;
 		email: string;
 	}
+	export let data: PageData;
+	export let errors: Errors;
+
+	$: console.log(errors);
+	$: console.log(data);
 	afterNavigate((navigation) => {
 		previousPage = navigation.from ? navigation.from.pathname : '/';
 	});
@@ -21,21 +27,21 @@
 		async onSubmit(values) {
 			loading = true;
 			values.previousPage = previousPage;
-			const response: Response = await fetch($page.url.pathname + '.json', {
-				method: 'post',
-				body: JSON.stringify(values),
-				headers: {
-					'Content-Type': 'application/json'
+			const { data, error } = await supabaseClientV2.auth.signInWithOtp({
+				email: values.email,
+				options: {
+					emailRedirectTo: `$/logging-in?previous_page=${previousPage}`
 				}
 			});
-			const data = await response.json();
-			if (!response.ok) throw data.error as string;
+			if (error) throw error.message;
+			if (data) return data.session;
 		},
-		onSuccess() {
+		onSuccess(value) {
 			isError = false;
 			modalTitle = 'Check your mail!';
 			modalContent = 'You can now close this tab';
 			isOpen = true;
+			console.log(value);
 		},
 		onError(error) {
 			isError = true;
@@ -52,7 +58,7 @@
 		<div class="card-body">
 			<div class="width" />
 			<h2 class="card-title">Welcome to PUG-2022</h2>
-			<form use:form method="post">
+			<form use:form>
 				<div class="field">
 					<label for="email" class="label">
 						<span class="label-text">Email</span>

@@ -3,15 +3,13 @@
 
 	import { goto } from '$app/navigation';
 
-	import { page, session } from '$app/stores';
-	import { username } from '$lib/stores/userStore';
+	import { page } from '$app/stores';
 
 	$: {
 		if (browser) {
 			const redirectTo = $page.url.searchParams.get('previous_page');
-			// check if user has been set in session store then redirect
-			if ($username && redirectTo) goto(redirectTo);
-			if ($session?.user?.id) goto('/register');
+			if ($page.data.profile && $page.data.user && redirectTo) goto(redirectTo);
+			if ($page.data.user) goto('/register');
 		}
 	}
 </script>
