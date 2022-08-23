@@ -1,21 +1,17 @@
-<script lang="ts" context="module">
-</script>
-
 <script lang="ts">
 	import { browser } from '$app/env';
 	import { goto } from '$app/navigation';
-	import { session } from '$app/stores';
+	import { page } from '$app/stores';
 
-	import { setProfile, user, username } from '$lib/stores/userStore';
 	import { supabaseClient } from '$lib/supabaseClient';
 	import { reporter } from '@felte/reporter-svelte';
 	import { validateSchema } from '@felte/validator-zod';
 	import { createForm } from 'felte';
 	import { z } from 'zod';
 	$: if (browser) {
-		if ($username) {
-			goto('/');
-		}
+		// if ($username) {
+		// 	goto('/');
+		// }
 	}
 	const createProfileValidator = z.object({
 		username: z.string()
@@ -30,7 +26,7 @@
 			try {
 				const { data, error } = await supabaseClient.from('profiles').upsert({
 					username: values.username,
-					id: $session.user.id
+					id: $page.data.user.id
 				});
 				if (error) throw error;
 				return { data };
@@ -41,7 +37,7 @@
 			}
 		},
 		onSuccess: async (values) => {
-			setProfile($session.user.id);
+			setProfile($page.data.user.id);
 			goto('/tickets');
 		}
 	});

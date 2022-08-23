@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { supabaseClient } from '$lib/supabaseClient';
 
-	import { session } from '$app/stores';
+	import { page } from '$app/stores';
 	import { queries } from '$lib/data/queries';
 	import { TicketMessageValidator, type TicketMessage } from '$lib/data/validation';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
@@ -33,7 +33,7 @@
 							ticket_id: ticketId,
 							content: values.content,
 							date_created: new Date().toISOString(),
-							user_id: $session.user.id
+							user_id: $page.data.user.id
 						}
 					])
 					.select(queries.fullTicketMessageQuery)

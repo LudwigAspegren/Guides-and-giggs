@@ -10,6 +10,8 @@ interface ImportMetaEnv {
     MSAL_AUTHORITY: string
     API_URI: string
     API_BASE_URI: string
+    VITE_SUPABASE_URI: string
+    VITE_SUPABASE_ANON_KEY: string
 
 }
 interface ImportMeta {

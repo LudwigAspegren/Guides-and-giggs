@@ -1,18 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { queries } from '$lib/data/queries';
-	import { TicketValidator, type Ticket } from '$lib/data/validation';
-	import { supabaseClient } from '$lib/supabaseClient';
+	import type { Ticket } from '$lib/data/validation';
+	import type { PageData } from './$types';
 
-	export let tickets: Ticket[];
-	async function loadData() {
-		if (!supabaseClient) throw 'supabase clinet not instantiated';
-		const { data } = await supabaseClient.from('tickets').select(queries.fullTicketQuery);
-		tickets = TicketValidator.array().parse(data);
-	}
-
-	loadData();
-
+	export let data: PageData;
 	const gotoTicket = (id: number) => {
 		goto(`/tickets/${id}`);
 	};
@@ -27,16 +18,16 @@
 	};
 	let TicketsChunks: Array<Array<Ticket>>;
 	$: {
-		if (tickets) {
-			console.log(tickets);
+		if (data.tickets) {
+			console.log(data.tickets);
 
-			TicketsChunks = chunkArray(50, tickets);
+			TicketsChunks = chunkArray(50, data.tickets);
 		}
 	}
 </script>
 
 <h1 class="h1">Tickets</h1>
-{#if tickets}
+{#if data.tickets}
 	<table class="table w-full">
 		<thead>
 			<tr>
@@ -47,11 +38,11 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each tickets as ticket}
+			{#each data.tickets as ticket}
 				<tr class="hover:bg-gray-50 hover:cursor-pointer" on:click={() => gotoTicket(ticket.id)}>
 					<th>{ticket.title}</th>
 					<td
-						><a href="/users/{ticket.profiles.id}">
+						><a href="/profiles/{ticket.profiles.id}">
 							{ticket.profiles.username}
 						</a>
 					</td>

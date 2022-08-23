@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/env';
-	import { goto, afterNavigate } from '$app/navigation';
-	import { session } from '$app/stores';
-	import { username } from '$lib/stores/userStore';
+	import { afterNavigate } from '$app/navigation';
 
 	import { supabaseClient } from '$lib/supabaseClient';
 
@@ -13,13 +10,6 @@
 		if (navigation.from) previousPage = navigation.from.pathname;
 		else previousPage = '/';
 	});
-	$: if (browser) {
-		console.log($session.user);
-		console.log($username);
-		if ($session.user) {
-			goto(previousPage);
-		}
-	}
 	const handleLogin = async () => {
 		try {
 			loading = true;

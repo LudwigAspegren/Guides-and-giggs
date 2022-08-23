@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import type { Errors, PageData } from './$types';
 
-	const gotoTicket = (id: number) => {
-		goto(`/tickets/${id}`);
-	};
+	export let data: PageData;
+	export let errors: Errors;
 </script>
 
 <!-- 

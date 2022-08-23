@@ -1,21 +1,21 @@
 export const queries = (() => {
-	const fullUserQuery = `
+    const fullProfileQuery = `
         id,
         username
     `;
-	const fullTicketMessageQuery = `
+    const fullTicketMessageQuery = `
         id,
         content,
         date_updated,
         date_created,
-        profiles (${fullUserQuery})
+        profiles (${fullProfileQuery})
     `;
-	const fullTicketQuery = `
+    const fullTicketQuery = `
         id,      
         title,
         date_updated,
         date_created,
-        profiles ( ${fullUserQuery} ),
+        profiles ( ${fullProfileQuery} ),
         statuses ( name ),
         courses ( name ),
         ticket_messages (
@@ -23,10 +23,10 @@ export const queries = (() => {
         )
     `;
 
-	return {
-		fullTicketQuery,
-		fullTicketMessageQuery,
-		fullUserQuery
-	};
+    return {
+        fullTicketQuery,
+        fullTicketMessageQuery,
+        fullProfileQuery
+    };
 })();
 

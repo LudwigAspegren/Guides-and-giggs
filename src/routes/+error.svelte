@@ -1,17 +1,11 @@
-<script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
-
-	export const load: Load = ({ error, status }) => {
-		return {
-			props: {
-				title: `${status}: ${error?.message}`
-			}
-		};
-	};
-</script>
-
 <script lang="ts">
-	export let title: string;
+	import { page } from '$app/stores';
+	import type { Errors, PageData } from './$types';
+	export let data: PageData;
+	export let errors: Errors;
 </script>
 
-<h1>{title}</h1>
+{#if $page.error}
+	<h1 class="h1">Error</h1>
+	<h1>{$page.status} : {$page.error.message}</h1>
+{/if}

@@ -3,5 +3,6 @@ export const variables = {
     msalAuthority: import.meta.env.VITE_MSAL_AUTHORITY,
     apiUri: import.meta.env.VITE_API_URI,
     baseUri: import.meta.env.VITE_BASE_URI,
-
+    supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    supabaseURI: import.meta.env.VITE_SUPABASE_URI,
 }

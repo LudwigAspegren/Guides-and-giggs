@@ -1,5 +1,5 @@
 import { supabaseClient } from '$lib/supabaseClient';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const data = await request.json();
@@ -15,16 +15,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	if (error) {
 		console.log(error);
-		return {
-			status: 400,
-
-			body: {
-				error: error.message
-				//values
-			}
-		};
+		return new Response(JSON.stringify({ error: error.message }), { status: 400 })
 	}
-	return {
-		status: 200
-	};
-};
+	console.log('hej')
+	return new Response(JSON.stringify({ data }), {
+		status: 200,
+		statusText: 'logging in',
+	})
+}

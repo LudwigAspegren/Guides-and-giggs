@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { session } from '$app/stores';
-
-	import { user } from '$lib/stores/userStore';
-
+	import { page } from '$app/stores';
 	import { computers, courses } from '$lib/stores/utilStore';
 	import { supabaseClient } from '$lib/supabaseClient';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
@@ -51,7 +48,7 @@
 					.insert({
 						title: values.title,
 						date_created: new Date().toISOString(),
-						user_id: $session.user.id,
+						user_id: $page.data.user.id,
 						course_id: values.courseId,
 						at_computer_lab: atComputerLab,
 						status_id: 1
@@ -84,7 +81,7 @@
 						ticket_id: ticketData.id,
 						content: values.content,
 						date_created: new Date().toISOString(),
-						user_id: $session.user.id
+						user_id: $page.data.user.id
 					});
 				if (messageError) throw messageError;
 				goto(`/tickets/${ticketData.id}`);
