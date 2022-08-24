@@ -1,4 +1,4 @@
-import { supabaseClient } from '$lib/supabaseClient';
+import { supabaseClientV2 } from '$lib/supabaseClientV2';
 import { writable, type Writable } from 'svelte/store';
 import { z } from 'zod';
 
@@ -29,10 +29,10 @@ export const courses: Writable<Course[]> = writable();
 export const computers: Writable<Computer[]> = writable();
 
 export const setUtils = async () => {
-	const coursePromise = supabaseClient.from<Course>('courses').select('*');
-	const statusPromise = supabaseClient.from<Status>('statuses').select('*');
-	const computerPromise = supabaseClient
-		.from<Computer>('computers')
+	const coursePromise = supabaseClientV2.from('courses').select('*');
+	const statusPromise = supabaseClientV2.from('statuses').select('*');
+	const computerPromise = supabaseClientV2
+		.from('computers')
 		.select('id,name, locations(id,name)');
 	const responses = await Promise.all([coursePromise, statusPromise, computerPromise]);
 	courses.set(z.array(CourseValidator).parse(responses[0].data));

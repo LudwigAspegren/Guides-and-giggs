@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import type { Errors, PageData } from './$types';
-	export let data: PageData;
-	export let errors: Errors;
 </script>
 
 {#if $page.error}

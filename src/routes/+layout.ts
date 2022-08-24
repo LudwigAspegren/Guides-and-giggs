@@ -6,10 +6,14 @@ import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async (event) => {
     if (!browser) return {}
-    const { data, error } = await supabaseClientV2.auth.getUser()
+    const { data, error } = await supabaseClientV2.auth.getSession()
+    console.log(data.session)
     let loggedInProfile: Profile | null | undefined
-    if (data.user) loggedInProfile = await setProfile(data.user.id)
-    return { user: data.user, loggedInProfile }
+    if (!data.session) throw new Error('No session found')
+    loggedInProfile = await setProfile(data.session.user.id)
+
+
+    return { user: data.session?.user, loggedInProfile }
 
 }
 const setProfile = async (userId: string): Promise<Profile | undefined> => {

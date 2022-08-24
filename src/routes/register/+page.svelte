@@ -3,15 +3,15 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
-	import { supabaseClient } from '$lib/supabaseClient';
+	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 	import { reporter } from '@felte/reporter-svelte';
 	import { validateSchema } from '@felte/validator-zod';
 	import { createForm } from 'felte';
 	import { z } from 'zod';
 	$: if (browser) {
-		// if ($username) {
-		// 	goto('/');
-		// }
+		if ($page.data.loggedInProfile) {
+			goto('/');
+		}
 	}
 	const createProfileValidator = z.object({
 		username: z.string()
@@ -24,7 +24,7 @@
 			loading = true;
 			console.log(values);
 			try {
-				const { data, error } = await supabaseClient.from('profiles').upsert({
+				const { data, error } = await supabaseClientV2.from('profiles').upsert({
 					username: values.username,
 					id: $page.data.user.id
 				});
@@ -37,7 +37,6 @@
 			}
 		},
 		onSuccess: async (values) => {
-			setProfile($page.data.user.id);
 			goto('/tickets');
 		}
 	});

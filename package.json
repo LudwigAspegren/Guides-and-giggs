@@ -35,10 +35,9 @@
 	"dependencies": {
 		"@felte/reporter-svelte": "^1.1.2",
 		"@felte/validator-zod": "^1.0.10",
-		"@supabase/auth-helpers-svelte": "^0.4.5",
-		"@supabase/auth-helpers-sveltekit": "^0.6.8",
-		"@supabase/supabase-js": "^2.0.0-rc.3",
+		"@supabase/supabase-js": "^2.0.0-rc.6",
 		"@vitejs/plugin-basic-ssl": "^0.1.1",
+		"cookie": "^0.5.0",
 		"daisyui": "^2.19.0",
 		"dotenv": "^16.0.1",
 		"felte": "^1.2.2",

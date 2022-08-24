@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { supabaseClient } from '$lib/supabaseClient';
+	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 
 	import { page } from '$app/stores';
 	import { queries } from '$lib/data/queries';
@@ -25,8 +25,8 @@
 		onSubmit: async (values) => {
 			try {
 				loading = true;
-				if (!supabaseClient) throw 'supabase clinet not instantiated';
-				const { data, error } = await supabaseClient
+				if (!supabaseClientV2) throw 'supabase clinet not instantiated';
+				const { data, error } = await supabaseClientV2
 					.from('ticket_messages')
 					.insert([
 						{

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 	import { createForm } from 'felte';
 	import type { Errors, PageData } from './$types';
@@ -27,10 +28,11 @@
 		async onSubmit(values) {
 			loading = true;
 			values.previousPage = previousPage;
+			console.log($page.url.origin + `/logging-in?previous_page=${previousPage}`);
 			const { data, error } = await supabaseClientV2.auth.signInWithOtp({
 				email: values.email,
 				options: {
-					emailRedirectTo: `$/logging-in?previous_page=${previousPage}`
+					emailRedirectTo: $page.url.origin + `/logging-in?previous_page=${previousPage}`
 				}
 			});
 			if (error) throw error.message;

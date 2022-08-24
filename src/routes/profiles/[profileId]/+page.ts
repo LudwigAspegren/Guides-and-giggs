@@ -5,15 +5,15 @@ import {
 } from '$lib/data/validation';
 import type { PageLoad } from './$types';
 
-import { supabaseClient } from '$lib/supabaseClient';
+import { supabaseClientV2 } from '$lib/supabaseClientV2';
 export const load: PageLoad = async (event) => {
 	const profileId = event.params.profileId;
-	const profilePromise = supabaseClient
+	const profilePromise = supabaseClientV2
 		.from('profiles')
 		.select(queries.fullProfileQuery)
 		.eq('id', profileId)
 		.single();
-	const ticketsPromise = supabaseClient
+	const ticketsPromise = supabaseClientV2
 		.from('tickets')
 		.select(queries.fullTicketQuery)
 		.eq('user_id', profileId);

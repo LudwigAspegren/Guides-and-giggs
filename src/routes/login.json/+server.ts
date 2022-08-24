@@ -1,4 +1,4 @@
-import { supabaseClient } from '$lib/supabaseClient';
+import { supabaseClientV2 } from '$lib/supabaseClientV2';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -8,9 +8,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	const previousPage = data.previousPage;
 	const values: Record<string, string> = { email, previousPage };
 	console.log(values);
-	const { error } = await supabaseClient.auth.signIn(
+	const { error } = await supabaseClientV2.auth.signInWithOtp(
 		{ email },
-		{ redirectTo: `$/logging-in?previous_page=${previousPage}` }
 	);
 
 	if (error) {
