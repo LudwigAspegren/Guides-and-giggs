@@ -1,25 +1,17 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { displayalert, displayModal } from '$lib/stores/notificationStore';
 	import { supabaseClientV2 } from '$lib/supabaseClientV2';
 	import { createForm } from 'felte';
-	import type { Errors, PageData } from './$types';
 
-	let modalTitle: string;
-	let modalContent: string;
-	let isError = false;
-	let isOpen = false;
 	let loading = false;
 	let previousPage = '/';
 	interface LoginForm {
 		previousPage: string;
 		email: string;
 	}
-	export let data: PageData;
-	export let errors: Errors;
-
-	$: console.log(errors);
-	$: console.log(data);
+	let inputField: HTMLInputElement;
 	afterNavigate((navigation) => {
 		previousPage = navigation.from ? navigation.from.pathname : '/';
 	});
@@ -35,22 +27,18 @@
 					emailRedirectTo: $page.url.origin + `/logging-in?previous_page=${previousPage}`
 				}
 			});
+			inputField.blur();
 			if (error) throw error.message;
-			if (data) return data.session;
+			if (data) return;
 		},
-		onSuccess(value) {
-			isError = false;
-			modalTitle = 'Check your mail!';
-			modalContent = 'You can now close this tab';
-			isOpen = true;
-			console.log(value);
+		onSuccess() {
+			// isError = false;
+			displayModal('Check your mail!', 'You can now close this tab');
 		},
 		onError(error) {
-			isError = true;
+			// isError = true;
 			loading = false;
-			modalTitle = 'Unexpected Error';
-			modalContent = error as string;
-			isOpen = true;
+			displayalert('Error', error as string, 'ERORR');
 		}
 	});
 </script>
@@ -67,11 +55,13 @@
 					</label>
 					<p class="control">
 						<input
+							bind:this={inputField}
 							id="email"
 							name="email"
 							class="input input-bordered w-full"
 							type="email"
 							placeholder="type here"
+							required
 						/>
 					</p>
 				</div>
@@ -89,19 +79,3 @@
 		</div>
 	</div>
 </main>
-
-<!-- Put this part before </body> tag -->
-<input type="checkbox" id="my-modal" class="modal-toggle" bind:checked={isOpen} />
-<div class="modal">
-	<div class="modal-box">
-		<h3 class="font-bold text-lg">{modalTitle}</h3>
-		<p class="py-4">
-			{modalContent}
-		</p>
-		<div class="modal-action">
-			{#if isError}
-				<label for="my-modal" class="btn">Close</label>
-			{/if}
-		</div>
-	</div>
-</div>

@@ -1,40 +1,7 @@
 <script lang="ts">
 </script>
 
-<!-- 
-<div class="overflow-x-auto">
-	<table class="table w-full">
-
-		<thead>
-			<tr>
-				<th>Title</th>
-				<th>Name</th>
-				<th>Status</th>
-				<th>Course</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#await ticketPromise}
-				<progress class="progress w-56" />
-			{:then tickets}
-				{#if tickets}
-					{#each tickets as ticket}
-						<tr
-							class="hover:bg-gray-50 hover:cursor-pointer"
-							on:click={() => gotoTicket(ticket.id)}
-						>
-							<th>{ticket.title}</th>
-							<td
-								><a href="/users/{ticket.user.id}">
-									{ticket.user.name}
-								</a>
-							</td>
-							<td>{ticket.status.name}</td>
-							<td>{ticket.course.name}</td>
-						</tr>
-					{/each}
-				{/if}
-			{/await}
-		</tbody>
-	</table>
-</div> -->
+<div class="grid place-content-center h-full">
+	<h2 class="p">Welcome to</h2>
+	<h1 class="h1 ">Guides & Gigs</h1>
+</div>

@@ -156,7 +156,6 @@ export interface Database {
                     status_id: number;
                     date_created: string;
                     date_updated: string | null;
-                    at_computer_lab: boolean;
                     id: number;
                 };
                 Insert: {
@@ -166,7 +165,6 @@ export interface Database {
                     status_id: number;
                     date_created: string;
                     date_updated?: string | null;
-                    at_computer_lab: boolean;
                     id?: number;
                 };
                 Update: {
@@ -176,7 +174,6 @@ export interface Database {
                     status_id?: number;
                     date_created?: string;
                     date_updated?: string | null;
-                    at_computer_lab?: boolean;
                     id?: number;
                 };
             };

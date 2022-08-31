@@ -22,7 +22,7 @@
 		extend: reporter(),
 		onSubmit: async (values) => {
 			loading = true;
-			console.log(values);
+
 			try {
 				const { data, error } = await supabaseClientV2.from('profiles').upsert({
 					username: values.username,
@@ -31,7 +31,6 @@
 				if (error) throw error;
 				return { data };
 			} catch (e: any) {
-				console.log(e.message);
 			} finally {
 				loading = false;
 			}

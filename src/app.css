@@ -4,4 +4,45 @@
 
 body{
    min-height: 100vh;
+   background-color: hsl(var(--b1));
+}
+p{
+   color: hsl(var(--bc))
+}
+h1{
+   color: hsl(var(--bc)),
+   
+}
+h2{
+   color: hsl(var(--bc))
+}
+h3{
+   color: hsl(var(--bc))
+}
+h4{
+   color: hsl(var(--bc))
+}
+b{
+   color: hsl(var(--bc))
+}
+th{
+      color: hsl(var(--bc))
+}
+a{
+   color:hsl(var(--bc));
+}
+td{
+   color: hsl(var(--bc))
+}
+a:hover{
+   color:hsl(var(--nc))
+}
+
+@layer components {
+   .main {
+     @apply container mx-auto max-w-5xl pt-32  bg-base-100
+   }
+}
+.drawer-content{
+  @apply z-auto;
 }

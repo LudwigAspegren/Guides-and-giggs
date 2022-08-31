@@ -1,98 +1,43 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import Alert from '$lib/compontents/alert.svelte';
+
+	import Drawer from '$lib/compontents/drawer.svelte';
+	import LoginModal from '$lib/compontents/loginModal.svelte';
+	import Navbar from '$lib/compontents/navbar.svelte';
+	import Transition from '$lib/compontents/transition.svelte';
 	import { courses, setUtils } from '$lib/stores/utilStore';
-	import { supabaseClientV2 } from '$lib/supabaseClientV2';
-	import type { LayoutData } from '.svelte-kit/types/src/routes/$types';
-	import { get } from 'svelte/store';
+	import { setContext } from 'svelte';
+	import { get, writable } from 'svelte/store';
 	import '../app.css';
+	import type { LayoutData } from './$types';
+	const shouldAnimate = writable(true);
+
+	setContext('shouldAnimate', shouldAnimate);
 	export let data: LayoutData;
 	data.loggedInProfile;
-	console.log('data');
 	const loadData = async () => {
 		if (!get(courses)) await setUtils();
 	};
 	$: if (data.user && data.user.id) {
 		loadData();
 	}
-	const logout = async () => {
-		await supabaseClientV2.auth.signOut();
-	};
 </script>
 
-<!-- <SupaAuthHelper {supabaseClient} {session}> -->
-<!-- Drawer -->
-<div class="drawer drawer-mobile">
-	<input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-	<div class="drawer-content flex flex-col items-center justify-start">
-		<!-- Navbar -->
-		<div
-			class=" sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm"
-		>
-			<div class="navbar max-w-full z-10">
-				<div class="flex justify-center">
-					<label for="my-drawer-2" class="cursor-pointer lg:hidden pr-2"
-						><svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							class="inline-block w-6 h-6 stroke-current"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 6h16M4 12h16M4 18h16"
-							/></svg
-						></label
-					>
-					<a class="normal-case text-xl lg:hidden" href="/">PUG-2022</a>
-				</div>
-				<div class="flex gap-4">
-					{#if data.user}
-						<div>
-							<a class="btn btn-sm btn-primary" href="/tickets/create"> Create ticket </a>
-						</div>
-						<div class="flex-none">
-							<ul class="menu menu-horizontal p-0">
-								<li tabindex="0">
-									<p>
-										{data.loggedInProfile?.username}
-										<svg
-											class="fill-current"
-											xmlns="http://www.w3.org/2000/svg"
-											width="20"
-											height="20"
-											viewBox="0 0 24 24"
-											><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" /></svg
-										>
-									</p>
-									<ul class="p-2 bg-base-100">
-										<li><a href="/profiles/{data.user?.id}">Profile</a></li>
-										<li><a on:click={logout} href="/tickets">Log out</a></li>
-									</ul>
-								</li>
-							</ul>
-						</div>
-					{:else if !data.user}
-						<a class="btn btn-sm btn-primary mr-4" href="/login"> Login </a>
-					{/if}
-				</div>
-			</div>
-		</div>
-		<!-- Main content -->
-		<main class="container mx-auto max-w-5xl mt-32">
-			<slot />
-		</main>
-	</div>
-	<div class="drawer-side">
-		<label for="my-drawer-2" class="drawer-overlay" />
-		<aside class="menu p-4 overflow-y-auto w-64 bg-base-200 shadow-inner sh text-base-content">
-			<!-- Sidebar content here -->
-			<div class="hidden lg:flex pb-4">
-				<a class="normal-case text-xl" href="/">PUG-2022</a>
-			</div>
-			<ul>
-				<li><a href="/tickets">Tickets</a></li>
-			</ul>
-		</aside>
-	</div>
-</div>
-<!-- </SupaAuthHelper> -->
+<Drawer>
+	<Navbar>
+		{#if $shouldAnimate}
+			<main class="main">
+				<Transition url={$page.url}>
+					<slot />
+				</Transition>
+			</main>
+		{:else}
+			<main class="main">
+				<slot />
+			</main>
+		{/if}
+	</Navbar>
+	<Alert />
+</Drawer>
+<LoginModal />

@@ -1,39 +1,144 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+
 	import type { Profile, Ticket, TicketMessage } from '$lib/data/validation';
+	import { supabaseClientV2 } from '$lib/supabaseClientV2';
+	import { validateSchema } from '@felte/validator-zod';
+	import { createForm } from 'felte';
+	import type { Database } from 'src/databaseDefintions';
+	import { quintOut } from 'svelte/easing';
+	import { scale, slide } from 'svelte/transition';
+	import { z } from 'zod';
+	import { deltaDate } from './utils';
 	export let ticket: Ticket;
 	export let ticketMessage: TicketMessage;
-	const deltaDate = (date: string): string => {
-		const msPerDay = 1000 * 60 * 60 * 24;
-		const a = new Date(date);
-		const b = new Date();
-		const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-		const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-		const deltaDays = Math.floor((utc2 - utc1) / msPerDay);
-		if (deltaDays === 0) return 'Today';
-		if (deltaDays === 1) return 'Yesterday';
-		return `${deltaDays} days ago`;
+	const authorCheck = (profileRef: Profile, profileTarget: Profile): boolean => {
+		return profileRef.id === profileTarget.id;
+		console.log;
+	};
+	const isOp = authorCheck(ticketMessage.profiles, ticket.profiles);
+	const isYou = authorCheck(
+		ticketMessage.profiles,
+		!!$page.data.loggedInProfile ? $page.data.loggedInProfile.id : ''
+	);
+	const giveTitle = (): string | undefined => {
+		if (isYou) return 'OP';
+		if (isOp) return 'You';
+	};
+	const title = giveTitle();
+	let isEditing: boolean = false;
+	let textArea: HTMLTextAreaElement | undefined;
+
+	const validator = z.object({
+		content: z.string().min(1, "Message can't be empty")
+	});
+	const { form } = createForm<z.infer<typeof validator>>({
+		validate: validateSchema(validator),
+		onSubmit: async (values) => {
+			console.log('hej');
+			const messageInsert: Database['public']['Tables']['ticket_messages']['Update'] = {
+				id: ticketMessage.id,
+				content: values.content,
+				date_updated: new Date().toISOString()
+			};
+			const { error: messageError } = await supabaseClientV2
+				.from('ticket_messages')
+				.update(messageInsert);
+
+			if (messageError) throw messageError;
+			return messageInsert;
+		},
+		onError: (e) => {
+			console.log(e);
+		},
+		onSuccess: (response) => {
+			ticketMessage.content =
+				(response as Database['public']['Tables']['ticket_messages']['Update']).content ?? '';
+			ticketMessage.date_updated =
+				(response as Database['public']['Tables']['ticket_messages']['Update']).date_updated ?? '';
+			ticketMessage = ticketMessage;
+			isEditing = false;
+		}
+	});
+
+	const changeEditing = () => {
+		isEditing = !isEditing;
 	};
 
-	const getAuthor = (messageProfile: Profile, ticketProfile: Profile): string | null => {
-		if (messageProfile.id === ticketProfile.id) return 'OP';
-		// Check aditional claims
-		return null;
-	};
+	function focus(node: HTMLTextAreaElement) {
+		setTimeout(() => {
+			node.focus();
+			node.selectionStart = node.textLength;
+		}, 300);
+	}
 </script>
 
-<div class="card-body py-2 px-4">
-	<div class="flex gap-2 pb-2 align-middle">
-		<a href="/profiles/{ticketMessage.profiles.id}">
-			<h2 class="card-title text-base mb-0">{ticketMessage.profiles.username}</h2></a
-		>
-		<p class="inline-block flex-grow-0">
-			{deltaDate(ticketMessage.date_updated ?? ticket.date_created)}
-		</p>
-		{#if getAuthor(ticketMessage.profiles, ticket.profiles)}
-			<div class="badge badge-ghost ml-2 self-center">
-				{getAuthor(ticketMessage.profiles, ticket.profiles)}
-			</div>
-		{/if}
+<div
+	class="card bg-base-100 {isOp ? 'mr-12' : 'ml-12'} overflow-auto transition-all"
+	in:slide={{ delay: 0, duration: 300, easing: quintOut }}
+>
+	<div class="card-body py-2 px-4 transition-all">
+		<div class="flex gap-2 transition-all">
+			<a href="/profiles/{ticketMessage.profiles.id}">
+				<h2 class="card-title text-base mb-0 leading align-middle w-fit whitespace-nowrap">
+					{ticketMessage.profiles.username}
+				</h2></a
+			>
+			<p class="inline-block flex-grow-0 leading-normal align-middle whitespace-nowrap">
+				{deltaDate(ticketMessage.date_created)}
+			</p>
+			{#if title}
+				<div class="badge badge-ghost ml-2 self-center whitespace-nowrap">
+					{title}
+				</div>
+			{/if}
+			{#if ticketMessage.date_updated}
+				<div
+					class="text-center text-sm align-middle leading-normal whitespace-nowrap"
+					transition:scale={{ duration: 200, start: 0.8 }}
+				>
+					edited {deltaDate(ticketMessage.date_updated)}
+				</div>
+			{/if}
+			<div class="w-full" />
+		</div>
+		<div class="transition-all">
+			{#if !isEditing}
+				<p>{ticketMessage.content}</p>
+			{:else}
+				{#key isEditing}
+					<form
+						use:form
+						class="flex flex-col gap-4 pb-2"
+						transition:slide={{ duration: 300 }}
+						id="message"
+					>
+						<textarea
+							class="textarea text-base p-0"
+							value={ticketMessage.content}
+							bind:this={textArea}
+							use:focus
+							name="content"
+						/>
+						<div class="self-end">
+							<button
+								class="font-medium uppercase text-xs pr-2"
+								on:click|preventDefault={changeEditing}
+							>
+								Cancel
+							</button>
+							<input type="submit" value="submit" name="messageId" class="btn btn-xs w-24" />
+						</div>
+					</form>
+				{/key}
+			{/if}
+			{#if isOp && !isEditing}
+				<div class="flex justify-end">
+					<button on:click={changeEditing} class="font-medium uppercase text-xs"> edit </button>
+				</div>
+			{:else}
+				<div class="h-2" />
+			{/if}
+		</div>
 	</div>
-	<p class="pb-4">{ticketMessage.content}</p>
 </div>
