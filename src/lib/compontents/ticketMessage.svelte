@@ -13,21 +13,16 @@
 	export let ticket: Ticket;
 	export let ticketMessage: TicketMessage;
 	const authorCheck = (profileRef: Profile, profileTarget: Profile): boolean => {
+		if (!profileRef || !profileTarget) return false;
+
 		return profileRef.id === profileTarget.id;
-		console.log;
 	};
+	// move this to a central location later
 	const isOp = authorCheck(ticketMessage.profiles, ticket.profiles);
-	const isYou = authorCheck(
-		ticketMessage.profiles,
-		!!$page.data.loggedInProfile ? $page.data.loggedInProfile.id : ''
-	);
-	const giveTitle = (): string | undefined => {
-		if (isYou) return 'OP';
-		if (isOp) return 'You';
-	};
-	const title = giveTitle();
+
+	$: isYou = authorCheck(ticketMessage.profiles, $page.data.loggedInProfile);
 	let isEditing: boolean = false;
-	let textArea: HTMLTextAreaElement | undefined;
+	console.log($page.data.loggedInProfile);
 
 	const validator = z.object({
 		content: z.string().min(1, "Message can't be empty")
@@ -60,7 +55,6 @@
 			isEditing = false;
 		}
 	});
-
 	const changeEditing = () => {
 		isEditing = !isEditing;
 	};
@@ -87,10 +81,8 @@
 			<p class="inline-block flex-grow-0 leading-normal align-middle whitespace-nowrap">
 				{deltaDate(ticketMessage.date_created)}
 			</p>
-			{#if title}
-				<div class="badge badge-ghost ml-2 self-center whitespace-nowrap">
-					{title}
-				</div>
+			{#if isOp}
+				<div class="badge badge-ghost ml-2 self-center whitespace-nowrap">OP</div>
 			{/if}
 			{#if ticketMessage.date_updated}
 				<div
@@ -105,6 +97,13 @@
 		<div class="transition-all">
 			{#if !isEditing}
 				<p>{ticketMessage.content}</p>
+				{#if isYou}
+					<div class="flex justify-end">
+						<button on:click={changeEditing} class="font-medium uppercase text-xs"> edit </button>
+					</div>
+				{:else}
+					<div class="h-2" />
+				{/if}
 			{:else}
 				{#key isEditing}
 					<form
@@ -116,7 +115,6 @@
 						<textarea
 							class="textarea text-base p-0"
 							value={ticketMessage.content}
-							bind:this={textArea}
 							use:focus
 							name="content"
 						/>
@@ -131,13 +129,6 @@
 						</div>
 					</form>
 				{/key}
-			{/if}
-			{#if isOp && !isEditing}
-				<div class="flex justify-end">
-					<button on:click={changeEditing} class="font-medium uppercase text-xs"> edit </button>
-				</div>
-			{:else}
-				<div class="h-2" />
 			{/if}
 		</div>
 	</div>
