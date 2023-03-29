@@ -47,7 +47,7 @@
 	<div class="card shadow-md px-10 md:max-w-lg">
 		<div class="card-body">
 			<div class="width" />
-			<h2 class="card-title">Welcome to PUG-2022</h2>
+			<h2 class="card-title">Welcome to Guides & Gigs</h2>
 			<form use:form>
 				<div class="field">
 					<label for="email" class="label">
